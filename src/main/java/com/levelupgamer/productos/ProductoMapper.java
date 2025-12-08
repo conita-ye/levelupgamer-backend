@@ -22,6 +22,8 @@ public class ProductoMapper {
         dto.setImagenes(p.getImagenes());
         dto.setActivo(p.getActivo());
         dto.setVendedor(buildVendedorDTO(p.getVendedor()));
+        dto.setFabricante(p.getFabricante());
+        dto.setDistribuidor(p.getDistribuidor());
         return dto;
     }
 

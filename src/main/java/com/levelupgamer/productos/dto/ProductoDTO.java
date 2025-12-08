@@ -24,4 +24,6 @@ public class ProductoDTO {
     private List<String> imagenes;
     private Boolean activo;
     private VendedorResumenDTO vendedor;
+    private String fabricante;
+    private String distribuidor;
 }
