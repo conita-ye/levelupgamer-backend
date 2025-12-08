@@ -57,6 +57,14 @@ public class Producto {
     @Size(max = 500)
     private String descripcion;
 
+    @Column(length = 100)
+    @Size(max = 100)
+    private String fabricante;
+
+    @Column(length = 100)
+    @Size(max = 100)
+    private String distribuidor;
+
     @Column(nullable = false, precision = 10, scale = 2)
     @NotNull
     @DecimalMin("0.0")
