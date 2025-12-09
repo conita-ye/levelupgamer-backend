@@ -102,7 +102,12 @@ public class BoletaService {
         DescuentoContexto descuentos = calcularDescuentos(total, usuario, cuponAplicado);
 
         Boleta boleta = guardarBoleta(usuario, detalles, descuentos, cuponAplicado);
-        procesarPuntos(usuario, puntosGanados);
+        
+        // Procesar puntos: puntos del producto + puntos por compra (1 punto por cada $100)
+        int puntosPorCompra = calcularPuntosPorCompra(descuentos.totalFinal());
+        int puntosTotales = puntosGanados + puntosPorCompra;
+        procesarPuntos(usuario, puntosTotales);
+        
         if (cuponAplicado != null) {
             cuponService.marcarComoUsado(cuponAplicado);
         }
@@ -242,6 +247,15 @@ public class BoletaService {
         if (puntosGanados > 0) {
             puntosService.sumarPuntos(new PuntosDTO(usuario.getId(), puntosGanados));
         }
+    }
+
+    /**
+     * Calcula puntos por compra: 1 punto por cada $100 CLP gastados
+     * Además de los puntos del producto (puntosLevelUp)
+     */
+    private int calcularPuntosPorCompra(BigDecimal totalFinal) {
+        // 1 punto por cada $100 CLP
+        return totalFinal.divide(new BigDecimal("100"), 0, RoundingMode.DOWN).intValue();
     }
 
     private Cupon procesarCupon(BoletaCrearDTO dto, Usuario usuario) {
