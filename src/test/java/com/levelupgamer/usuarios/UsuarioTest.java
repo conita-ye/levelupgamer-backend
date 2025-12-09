@@ -135,9 +135,8 @@ class UsuarioTest {
     @Test
     void buscarPorId_ConIdExistente_DeberiaRetornarUsuario() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioExistente));
-        when(puntosService.obtenerPuntosPorUsuario(1L)).thenReturn(new PuntosDTO(1L, 100));
 
-        Optional<UsuarioRespuestaDTO> resultado = usuarioService.buscarPorId(1L);
+        Optional<Usuario> resultado = usuarioService.buscarPorId(1L);
 
         assertThat(resultado).isPresent();
         assertThat(resultado.get().getId()).isEqualTo(1L);
@@ -148,7 +147,7 @@ class UsuarioTest {
     void buscarPorId_ConIdInexistente_DeberiaRetornarVacio() {
         when(usuarioRepository.findById(999L)).thenReturn(Optional.empty());
 
-        Optional<UsuarioRespuestaDTO> resultado = usuarioService.buscarPorId(999L);
+        Optional<Usuario> resultado = usuarioService.buscarPorId(999L);
 
         assertThat(resultado).isEmpty();
     }

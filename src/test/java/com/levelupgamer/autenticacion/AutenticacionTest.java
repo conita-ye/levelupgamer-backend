@@ -26,6 +26,9 @@ class AutenticacionTest {
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtProvider jwtProvider;
+
     @InjectMocks
     private AutenticacionService autenticacionService;
 
@@ -47,23 +50,28 @@ class AutenticacionTest {
                 .activo(true)
                 .build();
 
-        loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@example.com");
-        loginRequest.setPassword("password123");
+        loginRequest = LoginRequest.builder()
+                .correo("test@example.com")
+                .contrasena("password123")
+                .build();
     }
 
     @Test
     void login_ConCredencialesValidas_DeberiaRetornarToken() {
         when(usuarioRepository.findByCorreo("test@example.com")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("password123", usuario.getContrasena())).thenReturn(true);
+        when(jwtProvider.generateAccessToken(usuario, RolUsuario.CLIENTE)).thenReturn("test-access-token");
+        when(jwtProvider.generateRefreshToken(usuario)).thenReturn("test-refresh-token");
 
         LoginResponseDTO response = autenticacionService.login(loginRequest);
 
         assertNotNull(response);
         assertNotNull(response.getAccessToken());
         assertNotNull(response.getRefreshToken());
-        assertNotNull(response.getUser());
-        assertEquals("test@example.com", response.getUser().getEmail());
+        assertNotNull(response.getUsuarioId());
+        assertEquals(1L, response.getUsuarioId());
+        assertNotNull(response.getRoles());
+        assertTrue(response.getRoles().contains("CLIENTE"));
     }
 
     @Test
@@ -80,10 +88,13 @@ class AutenticacionTest {
     void login_ConUsuarioInexistente_DeberiaLanzarExcepcion() {
         when(usuarioRepository.findByCorreo("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        loginRequest.setEmail("nonexistent@example.com");
+        LoginRequest loginRequestInexistente = LoginRequest.builder()
+                .correo("nonexistent@example.com")
+                .contrasena("password123")
+                .build();
         
         assertThrows(BadCredentialsException.class, () -> {
-            autenticacionService.login(loginRequest);
+            autenticacionService.login(loginRequestInexistente);
         });
     }
 }
