@@ -52,12 +52,22 @@ public class AutenticacionService {
         }
 
         
+        RolUsuario rolSeleccionado;
         if (usuario.getRoles().size() > 1) {
-            throw new BadCredentialsException("El usuario tiene múltiples roles. Debe seleccionar uno.");
+            
+            if (usuario.getRoles().contains(RolUsuario.ADMINISTRADOR)) {
+                rolSeleccionado = RolUsuario.ADMINISTRADOR;
+            } else if (usuario.getRoles().contains(RolUsuario.VENDEDOR)) {
+                rolSeleccionado = RolUsuario.VENDEDOR;
+            } else {
+                rolSeleccionado = usuario.getRoles().iterator().next();
+            }
+        } else {
+            rolSeleccionado = usuario.getRoles().iterator().next();
         }
 
         
-        String accessToken = jwtProvider.generateAccessToken(usuario);
+        String accessToken = jwtProvider.generateAccessToken(usuario, rolSeleccionado);
         String refreshToken = jwtProvider.generateRefreshToken(usuario);
 
         return LoginResponseDTO.builder()

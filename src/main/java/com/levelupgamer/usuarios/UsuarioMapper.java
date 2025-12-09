@@ -35,7 +35,20 @@ public class UsuarioMapper {
         dto.setComuna(u.getComuna());
         dto.setDireccion(u.getDireccion());
         dto.setCodigoReferido(u.getCodigoReferido());
-        dto.setRol(u.getRoles() != null ? u.getRoles().toString() : null);
+        
+        // Obtener el rol principal: ADMINISTRADOR > VENDEDOR > CLIENTE
+        String rolPrincipal = null;
+        if (u.getRoles() != null && !u.getRoles().isEmpty()) {
+            if (u.getRoles().contains(RolUsuario.ADMINISTRADOR)) {
+                rolPrincipal = RolUsuario.ADMINISTRADOR.name();
+            } else if (u.getRoles().contains(RolUsuario.VENDEDOR)) {
+                rolPrincipal = RolUsuario.VENDEDOR.name();
+            } else {
+                rolPrincipal = u.getRoles().iterator().next().name();
+            }
+        }
+        dto.setRol(rolPrincipal);
+        
         dto.setFechaNacimiento(u.getFechaNacimiento());
         dto.setPuntosLevelUp(puntos);
         return dto;
