@@ -8,6 +8,7 @@ import com.levelupgamer.usuarios.Usuario;
 import com.levelupgamer.usuarios.UsuarioRepository;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,12 +44,13 @@ public class PuntosService {
     private final PuntosRepository puntosRepository;
     private final UsuarioRepository usuarioRepository;
     private final MovimientoPuntosRepository movimientoPuntosRepository;
+    @Lazy
     private final CuponService cuponService;
 
     public PuntosService(PuntosRepository puntosRepository,
                          UsuarioRepository usuarioRepository,
                          MovimientoPuntosRepository movimientoPuntosRepository,
-                         CuponService cuponService) {
+                         @Lazy CuponService cuponService) {
         this.puntosRepository = puntosRepository;
         this.usuarioRepository = usuarioRepository;
         this.movimientoPuntosRepository = movimientoPuntosRepository;

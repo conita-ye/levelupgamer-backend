@@ -8,6 +8,7 @@ import com.levelupgamer.gamificacion.PuntosService;
 import com.levelupgamer.usuarios.Usuario;
 import com.levelupgamer.usuarios.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class CuponService {
 
     private final CuponRepository cuponRepository;
     private final UsuarioRepository usuarioRepository;
+    @Lazy
     private final PuntosService puntosService;
 
     @Transactional

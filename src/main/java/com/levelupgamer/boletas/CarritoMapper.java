@@ -35,7 +35,8 @@ public class CarritoMapper {
                 carritoItem.getProducto().getId(),
                 carritoItem.getProducto().getNombre(),
                 carritoItem.getQuantity(),
-                carritoItem.getProducto().getPrecio().doubleValue()
+                carritoItem.getProducto().getPrecio().doubleValue(),
+                carritoItem.getProducto().getStock()
         );
     }
 }

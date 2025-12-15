@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Rut {
-    String message() default "RUT inválido";
+    String message() default "RUT inválido: verifica el dígito verificador";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

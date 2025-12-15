@@ -54,7 +54,8 @@ tmp/
 temp/
 
 # Environment-specific property files
-
+application-dev.properties
+application-local.properties
 
 # Maven wrapper scripts (optional, if you prefer to exclude them)
 mvnw

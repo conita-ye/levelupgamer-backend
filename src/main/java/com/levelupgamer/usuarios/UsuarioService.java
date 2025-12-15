@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,8 +51,9 @@ public class UsuarioService {
             throw new IllegalArgumentException("RUN es obligatorio");
         }
         String normalizedRun = dto.getRun().toUpperCase().replace(".", "").replace("-", "").trim();
-        if (normalizedRun.length() < 7 || normalizedRun.length() > 9) {
-            throw new IllegalArgumentException("RUN inválido: debe tener entre 7 y 9 caracteres sin puntos ni guion");
+        // Aceptar RUNs de 7-8 dígitos + 1 dígito verificador = 8-9 caracteres totales
+        if (normalizedRun.length() < 8 || normalizedRun.length() > 9) {
+            throw new IllegalArgumentException("RUN inválido: debe tener entre 8 y 9 caracteres (7-8 dígitos + 1 dígito verificador) sin puntos ni guion");
         }
 
         
@@ -148,11 +148,19 @@ public class UsuarioService {
         if (usuarioRepository.existsByCorreo(dto.getCorreo())) {
             throw new IllegalArgumentException("El correo ya está registrado");
         }
-        if (usuarioRepository.existsByRun(dto.getRun())) {
+        
+        // Normalizar el RUN igual que en registrarUsuario
+        String normalizedRun = dto.getRun().toUpperCase().replace(".", "").replace("-", "").trim();
+        if (normalizedRun.length() < 8 || normalizedRun.length() > 9) {
+            throw new IllegalArgumentException("RUN inválido: debe tener entre 8 y 9 caracteres (7-8 dígitos + 1 dígito verificador) sin puntos ni guion");
+        }
+        
+        if (usuarioRepository.existsByRun(normalizedRun)) {
             throw new IllegalArgumentException("El RUN ya está registrado");
         }
 
         Usuario usuario = UsuarioMapper.toEntity(dto);
+        usuario.setRun(normalizedRun);
         usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
         usuario.setRoles(java.util.Set.of(RolUsuario.ADMINISTRADOR, RolUsuario.CLIENTE)); 
         usuario.setActivo(true);
@@ -164,8 +172,16 @@ public class UsuarioService {
     @Transactional
     public boolean eliminarUsuario(Long id) {
         return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setActivo(false);
-            usuarioRepository.save(usuario);
+            // Eliminar físicamente si es "matias gutierres" con RUN 333333
+            String runLimpio = usuario.getRun().replace(".", "").replace("-", "").toUpperCase();
+            if (runLimpio.equals("333333") || runLimpio.startsWith("333333")) {
+                // Eliminar físicamente de la base de datos
+                usuarioRepository.delete(usuario);
+            } else {
+                // Para otros usuarios, solo desactivar
+                usuario.setActivo(false);
+                usuarioRepository.save(usuario);
+            }
             return true;
         }).orElse(false);
     }
